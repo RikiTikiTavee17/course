@@ -248,3 +248,4 @@ var NoteV1_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "note.proto",
 }
+
