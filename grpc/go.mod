@@ -1,11 +1,11 @@
-module gRPC_Project
+module github.com/RikiTikiTavee17/course/grpc
 
 go 1.23.0
 
 toolchain go1.23.5
 
 require (
-	github.com/RikiTikitavee17/course v0.0.0-20250221215157-e614d50ee85f
+	github.com/RikiTikitavee17/course v0.0.0-20250222103618-42dc3206663b
 	google.golang.org/grpc v1.70.0
 	google.golang.org/protobuf v1.36.5
 )

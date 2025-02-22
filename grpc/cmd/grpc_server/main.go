@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	desc "gRPC_Project/pkg/note_v1"
+	desc "github.com/RikiTikiTavee17/course/grpc/pkg/note_v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -21,7 +21,7 @@ type SyncMap struct {
 	num   int64
 }
 
-var notes = &SyncMap{elems: make(map[int64]*desc.Note), num: 0}
+var notes = &SyncMap{elems: make(map[int64]*desc.Note), num: 1}
 
 type server struct {
 	desc.UnimplementedNoteV1Server
@@ -69,9 +69,36 @@ func (s *server) Update(ctx context.Context, req *desc.UpdateRequest) (*emptypb.
 		if req.Info.GetContent() != nil {
 			n.Info.Content = req.Info.GetContent().GetValue()
 		}
+		if req.Info.GetStatus() != nil {
+			n.Info.Status = req.Info.GetStatus().GetValue()
+		}
 		n.UpdatedAt = timestamppb.New(time.Now())
 	}
 	return nil, nil
+}
+
+func (s *server) Delete(ctx context.Context, req *desc.DeleteRequest) (*emptypb.Empty, error) {
+	if notes.elems[req.GetId()] == nil {
+		return nil, errors.New("note with such id not found")
+	} else {
+		notes.elems[req.GetId()] = nil
+	}
+	return nil, nil
+}
+
+func (s *server) List(ctx context.Context, req *desc.ListRequest) (*desc.ListResponse, error) {
+	curr := make([]*desc.Note, 0)
+	if len(notes.elems) == 0 {
+		return nil, errors.New("no nodes to list")
+	}
+	for id := range notes.elems {
+		if notes.elems[id] != nil {
+			n := notes.elems[id]
+			curr = append(curr, n)
+		}
+	}
+	return &desc.ListResponse{Notes: curr}, nil
+
 }
 
 func main() {
