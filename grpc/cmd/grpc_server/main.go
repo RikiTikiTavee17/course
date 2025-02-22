@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	desc "gRPC_Project/pkg/note_v1"
+	desc "github.com/RikiTIkiTavee17/course/grpc/pkg/note_v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/types/known/emptypb"
