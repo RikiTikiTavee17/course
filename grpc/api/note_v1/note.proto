@@ -6,7 +6,7 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
 
-option go_package = "github.com/RikiTIkiTavee17/course/project1/grpc/pkg/note_v1;note_v1";
+option go_package = "github.com/RikiTIkiTavee17/course/grpc/pkg/note_v1;note_v1";
 
 service NoteV1{
   rpc Create(CreateRequest) returns (CreateResponse);
@@ -14,14 +14,40 @@ service NoteV1{
   rpc List(ListRequest) returns (ListResponse);
   rpc Update(UpdateRequest) returns (google.protobuf.Empty);
   rpc Delete(DeleteRequest) returns (google.protobuf.Empty);
+  rpc CreatePerson(CreatePersonReqest) returns (CreatePersonResponse);
+  rpc LogInPerson(LogInPersonRequest) returns (LogInPersonResponce);
 }
 
 message NoteInfo{
   string title = 1;
   string content = 2;
-  string author = 3;
-  bool is_public = 4;
+  int64 author = 3;
+  google.protobuf.Timestamp dead_line = 4;
   bool status = 5;
+}
+
+message Person{
+  int64 id = 1;
+  string Login = 2;
+  string password = 3;
+}
+
+message CreatePersonReqest{
+  string login = 1;
+  string password = 2;
+}
+
+message CreatePersonResponse{
+  int64 id = 1;
+}
+
+message LogInPersonRequest{
+  string login = 1;
+  string password = 2;
+}
+
+message LogInPersonResponce{
+  int64 id = 1;
 }
 
 message Note{
@@ -34,8 +60,8 @@ message Note{
 message UpdateNoteInfo{
   google.protobuf.StringValue title = 1;
   google.protobuf.StringValue content = 2;
-  google.protobuf.StringValue author = 3;
-  google.protobuf.BoolValue is_public = 4;
+  google.protobuf.Int64Value author = 3;
+  google.protobuf.Timestamp dead_line = 4;
   google.protobuf.BoolValue status = 5;
 }
 
@@ -56,8 +82,7 @@ message GetResponse{
 }
 
 message ListRequest{
-  int64 limit = 1;
-  int64 offset = 2;
+  int64 personId = 1;
 }
 
 message ListResponse{
