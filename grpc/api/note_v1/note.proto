@@ -28,7 +28,7 @@ message NoteInfo{
 
 message Person{
   int64 id = 1;
-  string Login = 2;
+  string login = 2;
   string password = 3;
 }
 

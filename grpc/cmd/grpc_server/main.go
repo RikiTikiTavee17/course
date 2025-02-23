@@ -21,7 +21,15 @@ type SyncMap struct {
 	num   int64
 }
 
+type LoginMap struct {
+	checks  map[string]string
+	idLogin map[int64]string
+	loginId map[string]int64
+	num     int64
+}
+
 var notes = &SyncMap{elems: make(map[int64]*desc.Note), num: 1}
+var users = &LoginMap{checks: make(map[string]string), idLogin: make(map[int64]string), loginId: make(map[string]int64), num: 1}
 
 type server struct {
 	desc.UnimplementedNoteV1Server
@@ -31,9 +39,7 @@ func (s *server) Get(ctx context.Context, req *desc.GetRequest) (*desc.GetRespon
 	log.Printf("Note id: %d", req.GetId())
 	n := notes.elems[req.GetId()]
 	if n == nil {
-		return &desc.GetResponse{
-			Note: n,
-		}, errors.New("note with such id not found")
+		return nil, errors.New("note with such id not found")
 	}
 	return &desc.GetResponse{
 		Note: n,
@@ -57,9 +63,6 @@ func (s *server) Update(ctx context.Context, req *desc.UpdateRequest) (*emptypb.
 		return nil, errors.New("note with such id not found")
 	} else {
 		n := notes.elems[req.GetId()]
-		if req.Info.GetIsPublic() != nil {
-			n.Info.IsPublic = req.Info.GetIsPublic().GetValue()
-		}
 		if req.Info.GetAuthor() != nil {
 			n.Info.Author = req.Info.GetAuthor().GetValue()
 		}
@@ -71,6 +74,9 @@ func (s *server) Update(ctx context.Context, req *desc.UpdateRequest) (*emptypb.
 		}
 		if req.Info.GetStatus() != nil {
 			n.Info.Status = req.Info.GetStatus().GetValue()
+		}
+		if req.Info.GetDeadLine() != nil {
+			n.Info.DeadLine = req.Info.GetDeadLine()
 		}
 		n.UpdatedAt = timestamppb.New(time.Now())
 	}
@@ -88,17 +94,35 @@ func (s *server) Delete(ctx context.Context, req *desc.DeleteRequest) (*emptypb.
 
 func (s *server) List(ctx context.Context, req *desc.ListRequest) (*desc.ListResponse, error) {
 	curr := make([]*desc.Note, 0)
-	if len(notes.elems) == 0 {
-		return nil, errors.New("no nodes to list")
-	}
+	personId := req.GetPersonId()
 	for id := range notes.elems {
-		if notes.elems[id] != nil {
+		if notes.elems[id] != nil && personId == notes.elems[id].GetInfo().GetAuthor() && !notes.elems[id].GetInfo().GetStatus() {
 			n := notes.elems[id]
 			curr = append(curr, n)
 		}
 	}
 	return &desc.ListResponse{Notes: curr}, nil
+}
 
+func (s *server) CreatePerson(ctx context.Context, req *desc.CreatePersonReqest) (*desc.CreatePersonResponse, error) {
+	if users.checks[req.GetLogin()] == "" {
+		id := users.num
+		users.num++
+		users.idLogin[id] = req.GetLogin()
+		users.checks[req.GetLogin()] = req.GetPassword()
+		users.loginId[req.GetLogin()] = id
+		return &desc.CreatePersonResponse{Id: id}, nil
+	} else {
+		return nil, errors.New("user with this name is  already registered")
+	}
+}
+
+func (s *server) LogInPerson(ctx context.Context, req *desc.LogInPersonRequest) (*desc.LogInPersonResponce, error) {
+	if users.checks[req.GetLogin()] == req.Password {
+		return &desc.LogInPersonResponce{Id: users.loginId[req.GetLogin()]}, nil
+	} else {
+		return nil, errors.New("incorrect login or password")
+	}
 }
 
 func main() {
