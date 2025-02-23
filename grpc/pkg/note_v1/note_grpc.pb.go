@@ -28,6 +28,8 @@ type NoteV1Client interface {
 	List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
 	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	CreatePerson(ctx context.Context, in *CreatePersonReqest, opts ...grpc.CallOption) (*CreatePersonResponse, error)
+	LogInPerson(ctx context.Context, in *LogInPersonRequest, opts ...grpc.CallOption) (*LogInPersonResponce, error)
 }
 
 type noteV1Client struct {
@@ -83,6 +85,24 @@ func (c *noteV1Client) Delete(ctx context.Context, in *DeleteRequest, opts ...gr
 	return out, nil
 }
 
+func (c *noteV1Client) CreatePerson(ctx context.Context, in *CreatePersonReqest, opts ...grpc.CallOption) (*CreatePersonResponse, error) {
+	out := new(CreatePersonResponse)
+	err := c.cc.Invoke(ctx, "/note_v1.NoteV1/CreatePerson", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *noteV1Client) LogInPerson(ctx context.Context, in *LogInPersonRequest, opts ...grpc.CallOption) (*LogInPersonResponce, error) {
+	out := new(LogInPersonResponce)
+	err := c.cc.Invoke(ctx, "/note_v1.NoteV1/LogInPerson", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NoteV1Server is the server API for NoteV1 service.
 // All implementations must embed UnimplementedNoteV1Server
 // for forward compatibility
@@ -92,6 +112,8 @@ type NoteV1Server interface {
 	List(context.Context, *ListRequest) (*ListResponse, error)
 	Update(context.Context, *UpdateRequest) (*emptypb.Empty, error)
 	Delete(context.Context, *DeleteRequest) (*emptypb.Empty, error)
+	CreatePerson(context.Context, *CreatePersonReqest) (*CreatePersonResponse, error)
+	LogInPerson(context.Context, *LogInPersonRequest) (*LogInPersonResponce, error)
 	mustEmbedUnimplementedNoteV1Server()
 }
 
@@ -113,6 +135,12 @@ func (UnimplementedNoteV1Server) Update(context.Context, *UpdateRequest) (*empty
 }
 func (UnimplementedNoteV1Server) Delete(context.Context, *DeleteRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedNoteV1Server) CreatePerson(context.Context, *CreatePersonReqest) (*CreatePersonResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePerson not implemented")
+}
+func (UnimplementedNoteV1Server) LogInPerson(context.Context, *LogInPersonRequest) (*LogInPersonResponce, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LogInPerson not implemented")
 }
 func (UnimplementedNoteV1Server) mustEmbedUnimplementedNoteV1Server() {}
 
@@ -217,6 +245,42 @@ func _NoteV1_Delete_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NoteV1_CreatePerson_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePersonReqest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NoteV1Server).CreatePerson(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/note_v1.NoteV1/CreatePerson",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NoteV1Server).CreatePerson(ctx, req.(*CreatePersonReqest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NoteV1_LogInPerson_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogInPersonRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NoteV1Server).LogInPerson(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/note_v1.NoteV1/LogInPerson",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NoteV1Server).LogInPerson(ctx, req.(*LogInPersonRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NoteV1_ServiceDesc is the grpc.ServiceDesc for NoteV1 service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -243,6 +307,14 @@ var NoteV1_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _NoteV1_Delete_Handler,
+		},
+		{
+			MethodName: "CreatePerson",
+			Handler:    _NoteV1_CreatePerson_Handler,
+		},
+		{
+			MethodName: "LogInPerson",
+			Handler:    _NoteV1_LogInPerson_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
