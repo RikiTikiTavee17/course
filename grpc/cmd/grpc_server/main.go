@@ -48,14 +48,19 @@ func (s *server) Get(ctx context.Context, req *desc.GetRequest) (*desc.GetRespon
 
 func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
 	var id int64 = notes.num
-	notes.num++
-	notes.elems[id] = &desc.Note{
-		Id:        id,
-		Info:      req.Info,
-		CreatedAt: timestamppb.New(time.Now()),
-		UpdatedAt: timestamppb.New(time.Now()),
+	a := users.idLogin[req.GetInfo().GetAuthor()]
+	if a != "" {
+		notes.num++
+		notes.elems[id] = &desc.Note{
+			Id:        id,
+			Info:      req.Info,
+			CreatedAt: timestamppb.New(time.Now()),
+			UpdatedAt: timestamppb.New(time.Now()),
+		}
+		return &desc.CreateResponse{Id: id}, nil
+	} else {
+		return nil, errors.New("there is no user with such id in system")
 	}
-	return &desc.CreateResponse{Id: id}, nil
 }
 
 func (s *server) Update(ctx context.Context, req *desc.UpdateRequest) (*emptypb.Empty, error) {
@@ -95,6 +100,9 @@ func (s *server) Delete(ctx context.Context, req *desc.DeleteRequest) (*emptypb.
 func (s *server) List(ctx context.Context, req *desc.ListRequest) (*desc.ListResponse, error) {
 	curr := make([]*desc.Note, 0)
 	personId := req.GetPersonId()
+	if users.idLogin[personId] == "" {
+		return nil, errors.New("there is no users with such id in system")
+	}
 	for id := range notes.elems {
 		if notes.elems[id] != nil && personId == notes.elems[id].GetInfo().GetAuthor() && !notes.elems[id].GetInfo().GetStatus() {
 			n := notes.elems[id]
