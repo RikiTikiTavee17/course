@@ -23,7 +23,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Login to Docker Registry
-        run: docker login -u token -p CRgAAAAA25585DDnneMa6u0Wbc8Qk43iRLoTvDJM cr.selcloud.ru/registry
+        run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
 
       - name: Build and Push Docker Image
         run: |
