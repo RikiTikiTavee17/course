@@ -9,6 +9,7 @@ on:
 env:
   REGISTRY: "cr.selcloud.ru/registry"
   IMAGE_NAME: "crud-server"
+  TAG_NAME: "v1"
   CONTAINER_NAME: "crud-server-container"
 
 jobs:
