@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, To-Do_List]
   pull_request:
-    branches: [main, master]
+    branches: [main, master, To-Do_List]
 
 env:
   REGISTRY: "cr.selcloud.ru/registry"
