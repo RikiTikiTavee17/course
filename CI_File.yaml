@@ -11,6 +11,7 @@ env:
   IMAGE_NAME: "crud-server"
   CONTAINER_NAME: "crud-server-container"
 
+
 jobs:
   image-build-and-push:
     runs-on: ubuntu-latest
