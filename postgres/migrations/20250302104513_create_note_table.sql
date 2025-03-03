@@ -11,8 +11,8 @@ CREATE TABLE note (
 );
 
 CREATE TABLE persons (
-    id BIGINT PRIMARY KEY,
-    login TEXT NOT NULL,
+    id BIGINT NOT NULL,
+    login TEXT PRIMARY KEY,
     password TEXT NOT NULL
 );
 

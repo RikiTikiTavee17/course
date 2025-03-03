@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: "cr.selcloud.ru/registry"
-  IMAGE_NAME: "crud-server"
+  IMAGE_NAME1: "crud-server"
   CONTAINER_NAME: "crud-server-container"
 
 jobs:
@@ -29,7 +29,9 @@ jobs:
         run: |
           TAG_NAME=$(echo $GITHUB_SHA | head -c7)
           docker buildx create --use
-          docker buildx build --no-cache --push --tag $REGISTRY/$IMAGE_NAME:$TAG_NAME -f grpc/Dockerfile grpc/ 
+          docker buildx build --no-cache --push --tag $REGISTRY/$IMAGE_NAME1:$TAG_NAME -f grpc/Dockerfile grpc/ 
+          docker-compose build --no-cache -f postgres/docker-compose.yaml
+          docker-compose push $REGISTRY/$IMAGE_NAME:$TAG_NAME
 
   deploy-image:
     runs-on: ubuntu-latest
@@ -53,9 +55,12 @@ jobs:
             
             # Stop running container
             docker stop crud-server-container
+            docker-compose down
             
             # Remove old container
             docker rm crud-server-container
+            docker-compose rm
             
             # Run a new container from a new image
-            docker run -d -p 50051:50051 --name $CONTAINER_NAME -t $REGISTRY/$IMAGE_NAME:$TAG_NAME
+            docker run -d -p 50051:50051 --name $CONTAINER_NAME -t $REGISTRY/$IMAGE_NAME1:$TAG_NAME
+            docker-compose -f postgres/docker-compose.yml up -d
