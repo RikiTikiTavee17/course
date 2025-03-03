@@ -4,6 +4,7 @@ COPY . /github.com/RikiTikiTavee17/course/grpc/source/
 WORKDIR /github.com/RikiTikiTavee17/course/grpc/source/
 
 RUN go mod download
+RUN go install github.com/pressly/goose/v3/cmd/goose@v3.14.0
 RUN go build -o ./bin/crud_server cmd/grpc_server/main.go
 
 
