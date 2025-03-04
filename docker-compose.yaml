@@ -8,9 +8,9 @@ services:
       POSTGRES_PASSWORD: mypassword
       POSTGRES_DB: mydatabase
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./docker-entrypoint-initdb.d/init.sql/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "54321:54321"
+      - "54321:5432"
 
   server:
     build:

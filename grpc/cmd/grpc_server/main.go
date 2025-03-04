@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	dbDSN    = "host=db port=54321 dbname=note user=note-user password=note-password sslmode=disable"
+	dbDSN    = "host=localhost port=54321 dbname=note user=note-user password=note-password sslmode=disable"
 	grpcPort = 50051
 )
 
