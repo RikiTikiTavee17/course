@@ -7,9 +7,9 @@ services:
   pg:
     image: postgres:14-alpine3.17
     environment:
-      - "POSTGRES_DB=${PG_DATABASE_NAME}"
-      - "POSTGRES_USER=${PG_USER}"
-      - "POSTGRES_PASSWORD=${PG_PASSWORD}"
+      - "POSTGRES_DB=note"
+      - "POSTGRES_USER=note-user"
+      - "POSTGRES_PASSWORD=note-password"
     ports:
       - "${PG_PORT}:5432"
     volumes:
@@ -31,9 +31,3 @@ services:
       - "50051:50051"
     depends_on:
       - pg
-    environment:
-      PG_DATABASE_NAME: note
-      PG_USER: note-user
-      PG_PASSWORD: note-password
-      PG_PORT: 54321
-      MIGRATION_DIR: ./migrations
