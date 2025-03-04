@@ -6,7 +6,6 @@ WORKDIR /github.com/RikiTikiTavee17/course/grpc/source/
 RUN go mod download
 RUN go build -o ./bin/crud_server cmd/grpc_server/main.go
 
-
 FROM alpine:latest
 
 WORKDIR /root/
