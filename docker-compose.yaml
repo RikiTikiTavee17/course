@@ -9,6 +9,7 @@ services:
       POSTGRES_DB: note
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - course-db-data:/var/lib/postgresql/data  # здесь мы создаем volume для сохранения данных
     ports:
       - "54321:5432"
 
@@ -26,3 +27,5 @@ services:
       - "50051:50051"
     depends_on:
       - db
+volumes:
+  course-db-data:  # определяем volume
