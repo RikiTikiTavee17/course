@@ -33,8 +33,8 @@ jobs:
       - name: Build and Push Docker Images with Docker Compose
         run: |
           TAG_NAME=$(echo $GITHUB_SHA | head -c7)
-          docker-compose -f course/docker-compose.yaml build
-          docker-compose -f course/docker-compose.yaml push
+          docker-compose -f docker-compose.yaml build
+          docker-compose -f docker-compose.yaml push
 
   deploy:
     runs-on: ubuntu-latest
