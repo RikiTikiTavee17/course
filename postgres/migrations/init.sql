@@ -1,4 +1,3 @@
--- +goose Up
 CREATE TABLE note (
     id BIGINT PRIMARY KEY,
     title TEXT NOT NULL,
@@ -15,7 +14,3 @@ CREATE TABLE persons (
     login TEXT PRIMARY KEY,
     password TEXT NOT NULL
 );
-
--- +goose Down
-drop table note;
-drop table persons;
