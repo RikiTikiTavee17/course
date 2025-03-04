@@ -1,0 +1,40 @@
+version: '3.8'
+
+volumes:
+  postgres_volume:
+
+services:
+  pg:
+    image: postgres:14-alpine3.17
+    environment:
+      - "POSTGRES_DB=${PG_DATABASE_NAME}"
+      - "POSTGRES_USER=${PG_USER}"
+      - "POSTGRES_PASSWORD=${PG_PASSWORD}"
+    ports:
+      - "${PG_PORT}:5432"
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+
+  migrator:
+    build:
+      context: postgres
+      dockerfile: postgres/migration.Dockerfile
+    restart: on-failure
+    environment:
+      DB_HOST: pg
+
+  grpc_server:
+    build:
+      context: grpc
+      dockerfile: grpc/Dockerfile
+    ports:
+      - "50051:50051"
+    depends_on:
+      - pg
+    environment:
+      DB_HOST: pg
+      DB_NAME: note
+      DB_USER: note-user
+      DB_PASSWORD: note-password
+      DB_PORT: 54321
+      MIGRATION_DIR: ./postgres/migrations
