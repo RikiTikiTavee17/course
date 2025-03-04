@@ -18,7 +18,7 @@ services:
   migrator:
     build:
       context: postgres
-      dockerfile: postgres/migration.Dockerfile
+      dockerfile: migration.Dockerfile
     restart: on-failure
     environment:
       DB_HOST: pg
@@ -26,15 +26,14 @@ services:
   grpc_server:
     build:
       context: grpc
-      dockerfile: grpc/Dockerfile
+      dockerfile: Dockerfile
     ports:
       - "50051:50051"
     depends_on:
       - pg
     environment:
-      DB_HOST: pg
-      DB_NAME: note
-      DB_USER: note-user
-      DB_PASSWORD: note-password
-      DB_PORT: 54321
-      MIGRATION_DIR: ./postgres/migrations
+      PG_DATABASE_NAME: note
+      PG_USER: note-user
+      PG_PASSWORD: note-password
+      PG_PORT: 54321
+      MIGRATION_DIR: ./migrations
