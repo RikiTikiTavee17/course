@@ -10,7 +10,7 @@ const initializer = {
         const { NoteV1Client } = require('./note_grpc_web_pb');
         const { CreatePersonReqest, LogInPersonRequest, CreateRequest, GetRequest, ListRequest, UpdateRequest, DeleteRequest, NoteInfo } = require('./note_pb');
 
-        const client = new NoteV1Client('http://localhost:8080', null, null);
+        const client = new NoteV1Client('http://envoy:8080', null, null);
 
         const logGrpcError = (err) => {
             console.error('gRPC Error:', { message: err.message, code: err.code, details: err.details || 'No details' });

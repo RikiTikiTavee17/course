@@ -63,16 +63,16 @@ static_resources:
                 http_filters:
                   - name: envoy.filters.http.cors
                     typed_config:
-                      "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors"
                   - name: envoy.filters.http.grpc_web
                     typed_config:
-                      "@type": type.googleapis.com/envoy.extensions.filters.http.grpc_web.v3.GrpcWeb
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.grpc_web.v3.GrpcWeb"
                   - name: envoy.filters.http.router
                     typed_config:
-                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router"
   clusters:
     - name: grpc_service
-      connect_timeout: 0.25s
+      connect_timeout: 5s
       type: STRICT_DNS
       lb_policy: ROUND_ROBIN
       http2_protocol_options: {}
@@ -83,5 +83,5 @@ static_resources:
               - endpoint:
                   address:
                     socket_address:
-                      address: grpc-server
+                      address: server
                       port_value: 50051
