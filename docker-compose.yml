@@ -50,11 +50,17 @@ services:
       - ./frontend/envoy.yaml:/etc/envoy/envoy.yaml
     ports:
       - "8080:8080"
+      - "9901:9901"  # Административный порт для healthcheck
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:9901/server_info || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
     depends_on:
       server:
         condition: service_healthy
-    networks:
-      - app-network
 
   frontend:
     build:
@@ -62,12 +68,17 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    networks:
+      - app-network
     depends_on:
       envoy:
         condition: service_healthy
-    networks:
-      - app-network
     command: ["serve", "dist", "-l", "3000"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
 volumes:
   course-db-data:
