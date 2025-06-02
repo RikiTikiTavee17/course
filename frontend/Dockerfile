@@ -1,4 +1,4 @@
-# Используем многоэтапную сборку для уменьшения размера финального образа
+# Используем многоэтапную сборку
 FROM node:18-alpine AS builder
 
 WORKDIR /app
@@ -9,32 +9,29 @@ COPY package.json package-lock.json ./
 # 2. Устанавливаем зависимости (включая devDependencies)
 RUN npm install --include=dev
 
-# 3. Копируем исходный код
+# 3. Добавляем права на выполнение для webpack
+RUN chmod -R +x node_modules/.bin
+
+# 4. Копируем исходный код
 COPY . .
 
-# 4. Собираем приложение
-RUN npm run build  # Или webpack --mode production, если нет скрипта build
-
-# 5. Устанавливаем serve локально (не глобально)
-RUN npm install serve
+# 5. Собираем приложение (используем npx для гарантии работы)
+RUN npx webpack --mode production
 
 # Финальный образ
 FROM node:18-alpine
 
 WORKDIR /app
 
-# 6. Копируем только необходимые файлы из стадии builder
+# 6. Копируем только необходимые файлы
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules/serve ./node_modules/serve
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 
-# 7. Устанавливаем только production зависимости
-RUN npm install --omit=dev
+# 7. Устанавливаем serve локально
+RUN npm install serve
 
-# 8. Используем serve из node_modules
+# 8. Запускаем приложение
 CMD ["npx", "serve", "dist", "-l", "3000"]
 
-# Метаинформация
 EXPOSE 3000
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-  CMD curl -f http://localhost:3000 || exit 1
