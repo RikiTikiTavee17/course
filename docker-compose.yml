@@ -15,10 +15,10 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "note-user"]
+      test: ["CMD-SHELL", "pg_isready -U note-user -d note"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   server:
     build:
@@ -32,11 +32,17 @@ services:
       DB_PASSWORD: note-password
     ports:
       - "50051:50051"
+    networks:
+      - app-network
     depends_on:
       db:
         condition: service_healthy
-    networks:
-      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 50051 || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
 
   envoy:
     image: envoyproxy/envoy:v1.29.0
@@ -45,8 +51,8 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - server
-    container_name: envoy_proxy
+      server:
+        condition: service_healthy
     networks:
       - app-network
 
@@ -57,12 +63,11 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - envoy
-    container_name: frontend_app
+      envoy:
+        condition: service_healthy
     networks:
       - app-network
-    # Добавляем команду для проверки контейнера после запуска
-    command: sh -c "npm --version && npx --version && npx serve dist -l 3000"
+    command: ["serve", "dist", "-l", "3000"]
 
 volumes:
   course-db-data:
