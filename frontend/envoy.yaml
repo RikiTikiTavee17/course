@@ -56,7 +56,7 @@ static_resources:
                       response_headers_to_add:
                         - header:
                             key: "Access-Control-Allow-Origin"
-                            value: "http://localhost:3000"
+                            value: "http://91.219.189.79:3000"
                         - header:
                             key: "Access-Control-Expose-Headers"
                             value: "grpc-status, grpc-message"
