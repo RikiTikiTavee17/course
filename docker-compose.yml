@@ -49,7 +49,6 @@ services:
       - "3000:3000"
     networks:
       - app-network
-    command: ["serve", "dist", "-l", "3000"]
 
 volumes:
   course-db-data:
