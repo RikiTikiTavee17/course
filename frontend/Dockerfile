@@ -3,32 +3,37 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# 1. Копируем только файлы зависимостей
+# 1. Устанавливаем зависимости и билд-тулзы глобально
+RUN apk add --no-cache python3 make g++
+
+# 2. Копируем только файлы зависимостей
 COPY package.json package-lock.json ./
 
-# 2. Устанавливаем зависимости (включая devDependencies)
+# 3. Устанавливаем зависимости
 RUN npm install --include=dev
 
-# 3. Копируем исходный код
+# 4. Копируем исходный код
 COPY . .
 
-# 4. Собираем приложение (явно указываем путь к webpack)
-RUN ./node_modules/.bin/webpack --mode production
+# 5. Собираем приложение (альтернативные способы)
+RUN npm run build || \
+    npx webpack --mode production || \
+    node_modules/.bin/webpack --mode production
 
 # Финальный образ
 FROM node:18-alpine
 
 WORKDIR /app
 
-# 5. Копируем только необходимые файлы
+# 6. Копируем только необходимые файлы
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 
-# 6. Устанавливаем serve локально
+# 7. Устанавливаем serve
 RUN npm install serve
 
-# 7. Запускаем приложение
+# 8. Запускаем приложение
 CMD ["npx", "serve", "dist", "-l", "3000"]
 
 EXPOSE 3000
