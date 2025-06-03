@@ -14,11 +14,6 @@ services:
       - "54321:5432"
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U note-user -d note"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
 
   server:
     build:
@@ -34,14 +29,6 @@ services:
       - "50051:50051"
     networks:
       - app-network
-    depends_on:
-      db:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 50051 || exit 1"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
     restart: unless-stopped
 
   envoy:
@@ -53,14 +40,6 @@ services:
       - "9901:9901"  # Административный порт для healthcheck
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fs http://localhost:9901/server_info || exit 1"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-    depends_on:
-      server:
-        condition: service_healthy
 
   frontend:
     build:
@@ -70,15 +49,7 @@ services:
       - "3000:3000"
     networks:
       - app-network
-    depends_on:
-      envoy:
-        condition: service_healthy
     command: ["serve", "dist", "-l", "3000"]
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
 
 volumes:
   course-db-data:
