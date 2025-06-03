@@ -7,6 +7,11 @@ services:
       POSTGRES_USER: note-user
       POSTGRES_PASSWORD: note-password
       POSTGRES_DB: note
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U note-user -d note"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - course-db-data:/var/lib/postgresql/data
@@ -29,6 +34,9 @@ services:
       - "50051:50051"
     networks:
       - app-network
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
 
   envoy:
