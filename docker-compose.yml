@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: note-password
       POSTGRES_DB: note
     volumes:
-      - ./course/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - course-db-data:/var/lib/postgresql/data
     ports:
       - "54321:5432"
