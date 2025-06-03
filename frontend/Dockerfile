@@ -9,19 +9,15 @@ RUN apk add --no-cache python3 make g++
 # 2. Копируем только файлы зависимостей (для лучшего кэширования)
 COPY package.json package-lock.json ./
 
-# 3. Устанавливаем зависимости
+# 3. Устанавливаем зависимости (включая dev-зависимости)
 RUN npm install --include=dev
 
 # 4. Копируем исходный код
 COPY . .
 
-# 5. Варианты сборки с обработкой ошибок
-RUN { \
-  npm run build || \
-  npx webpack --mode production || \
-  ./node_modules/.bin/webpack --mode production || \
-  (echo "Build failed" && exit 1); \
-}
+# 5. Выставляем права на webpack и запускаем сборку
+RUN chmod +x ./node_modules/.bin/webpack && \
+    npm run build
 
 # Финальный образ
 FROM node:18-alpine
@@ -32,7 +28,7 @@ WORKDIR /app
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 
-# 7. Устанавливаем serve (если не скопировался из builder)
+# 7. Устанавливаем serve (на всякий случай, если нужно обновить)
 RUN npm install serve
 
 # 8. Запускаем приложение
