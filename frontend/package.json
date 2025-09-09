@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "client.js",
   "scripts": {
-    "build": "webpack --mode production",
-    "start": "serve dist -l 3000"
-  },
+  "build": "npx webpack --mode production",
+  "start": "serve dist -l 3000"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",

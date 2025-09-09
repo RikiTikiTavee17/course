@@ -1,37 +1,38 @@
+# =========================
 # Этап сборки
+# =========================
 FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# 1. Устанавливаем системные зависимости для сборки
 RUN apk add --no-cache python3 make g++
 
-# 2. Копируем только файлы зависимостей (для лучшего кэширования)
-COPY package.json package-lock.json ./
+# !!! Обязательно указываем NODE_ENV=development, чтобы ставились devDependencies
+ENV NODE_ENV=development
 
-# 3. Устанавливаем зависимости (включая dev-зависимости)
-RUN npm install --include=dev
+COPY package*.json ./
+RUN npm ci --include=dev
 
-# 4. Копируем исходный код
 COPY . .
 
-# 5. Выставляем права на webpack и запускаем сборку
-RUN chmod +x ./node_modules/.bin/webpack && \
-    npm run build
+# Проверка, что webpack реально установлен
+RUN ls -la node_modules/.bin && npm list --depth=0
 
+# Запуск сборки напрямую через Node
+RUN node ./node_modules/webpack/bin/webpack.js --mode production
+
+# =========================
 # Финальный образ
+# =========================
 FROM node:18-alpine
 
 WORKDIR /app
 
-# 6. Копируем только необходимые файлы
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 
-# 7. Устанавливаем serve (на всякий случай, если нужно обновить)
 RUN npm install serve
 
-# 8. Запускаем приложение
 CMD ["npx", "serve", "dist", "-l", "3000"]
 
 EXPOSE 3000
